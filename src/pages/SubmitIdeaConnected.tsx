@@ -83,7 +83,6 @@ const SubmitIdea = () => {
     try {
       setSubmitting(true);
       
-      // Simulate AI analysis time for better UX
       const response = await ideasAPI.create({
         title,
         description,
@@ -92,9 +91,6 @@ const SubmitIdea = () => {
         imageUrl: imagePreview || undefined,
         tags,
       });
-
-      // Add a small delay to show the AI analysis process
-      await new Promise(resolve => setTimeout(resolve, 1500));
 
       setAiResults(response.data.idea);
       setShowAiResults(true);
@@ -161,43 +157,6 @@ const SubmitIdea = () => {
           </div>
         </div>
       </header>
-
-      {/* AI Analysis Loading Overlay */}
-      {submitting && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-          <Card className="p-8 max-w-md mx-4 text-center">
-            <div className="mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 relative">
-                <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-                <Sparkles className="w-6 h-6 text-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">AI Analyzing Your Idea</h3>
-              <p className="text-muted-foreground">
-                Our AI is evaluating your innovation across multiple dimensions...
-              </p>
-            </div>
-            
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span>Clarity Analysis</span>
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Innovation Assessment</span>
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Feasibility Check</span>
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Impact Evaluation</span>
-                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
 
       {/* Form */}
       <main className="max-w-4xl mx-auto px-6 py-8">
@@ -375,10 +334,8 @@ const SubmitIdea = () => {
               >
                 {submitting ? (
                   <>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>AI Analyzing...</span>
-                    </div>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Analyzing with AI...
                   </>
                 ) : (
                   <>

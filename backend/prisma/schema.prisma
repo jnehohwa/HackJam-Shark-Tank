@@ -1,0 +1,106 @@
+// Prisma Schema for Shark Tank Mode
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String
+  password    String
+  microsoftId String?  @unique
+  points      Int      @default(0)
+  badges      String   @default("[]") // JSON array of badge names
+  role        String   @default("user") // user, mentor, admin
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ideas       Idea[]
+  votes       Vote[]
+  comments    Comment[]
+
+  @@map("users")
+}
+
+model Idea {
+  id               String   @id @default(uuid())
+  title            String
+  description      String
+  category         String
+  videoLink        String?
+  imageUrl         String?
+  
+  // AI Scoring System
+  aiScore          Int      @default(0) // Overall 0-100
+  clarityScore     Int      @default(0) // 0-100
+  innovationScore  Int      @default(0) // 0-100
+  feasibilityScore Int      @default(0) // 0-100
+  impactScore      Int      @default(0) // 0-100
+  aiAnalysis       String?  // AI-generated feedback
+  aiProcessed      Boolean  @default(false)
+  
+  // Status Workflow: Submitted → Draft/Under Review → Approved/Rejected
+  status           String   @default("SUBMITTED") // SUBMITTED, DRAFT, UNDER_REVIEW, APPROVED, REJECTED
+  
+  // Metadata
+  authorId         String
+  author           User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  voteCount        Int      @default(0) // Cached count for performance
+  commentCount     Int      @default(0) // Cached count
+  
+  mentorPick       Boolean  @default(false)
+  trending         Boolean  @default(false)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  votes            Vote[]
+  comments         Comment[]
+
+  @@map("ideas")
+}
+
+model Vote {
+  userId    String
+  ideaId    String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, ideaId])
+  @@map("votes")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  userId    String
+  ideaId    String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Analytics {
+  id              String   @id @default(uuid())
+  totalIdeas      Int      @default(0)
+  totalUsers      Int      @default(0)
+  totalVotes      Int      @default(0)
+  totalComments   Int      @default(0)
+  ideasThisWeek   Int      @default(0)
+  updatedAt       DateTime @updatedAt
+
+  @@map("analytics")
+}
+

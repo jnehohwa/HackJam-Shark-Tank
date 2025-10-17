@@ -184,8 +184,6 @@ const Dashboard = () => {
                   author: idea.author?.name || "Unknown",
                   votes: idea.voteCount || 0,
                   comments: idea.commentCount || 0,
-                  status: idea.status || "SUBMITTED",
-                  aiProcessed: idea.aiProcessed || false,
                 }} />
               ))}
             </div>

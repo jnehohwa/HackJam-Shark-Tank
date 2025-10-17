@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageCircle, TrendingUp, Award } from "lucide-react";
+import { ThumbsUp, MessageCircle, TrendingUp, Award, CheckCircle, Clock, XCircle, Lightbulb, Zap } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface IdeaCardProps {
   idea: {
@@ -17,28 +18,78 @@ interface IdeaCardProps {
     imageUrl: string;
     tags: string[];
     mentorPick: boolean;
+    status?: string;
+    aiProcessed?: boolean;
+    createdAt?: string;
   };
 }
 
 export const IdeaCard = ({ idea }: IdeaCardProps) => {
+  const navigate = useNavigate();
   const [votes, setVotes] = useState(idea.votes);
   const [hasVoted, setHasVoted] = useState(false);
 
-  const handleVote = () => {
+  const handleVote = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
     if (!hasVoted) {
       setVotes(prev => prev + 1);
       setHasVoted(true);
     }
   };
 
+  const handleCardClick = () => {
+    navigate(`/idea/${idea.id}`);
+  };
+
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-accent";
-    if (score >= 60) return "text-primary";
-    return "text-muted-foreground";
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-blue-600";
+    if (score >= 40) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getScoreBgColor = (score: number) => {
+    if (score >= 80) return "bg-green-500";
+    if (score >= 60) return "bg-blue-500";
+    if (score >= 40) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "APPROVED":
+        return <CheckCircle className="w-3 h-3" />;
+      case "UNDER_REVIEW":
+        return <Clock className="w-3 h-3" />;
+      case "REJECTED":
+        return <XCircle className="w-3 h-3" />;
+      case "DRAFT":
+        return <Lightbulb className="w-3 h-3" />;
+      default:
+        return <Zap className="w-3 h-3" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "APPROVED":
+        return "bg-green-500/10 text-green-700 border-green-200";
+      case "UNDER_REVIEW":
+        return "bg-blue-500/10 text-blue-700 border-blue-200";
+      case "REJECTED":
+        return "bg-red-500/10 text-red-700 border-red-200";
+      case "DRAFT":
+        return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
+      default:
+        return "bg-gray-500/10 text-gray-700 border-gray-200";
+    }
   };
 
   return (
-    <Card className="group overflow-hidden bg-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 border border-border">
+    <Card 
+      onClick={handleCardClick}
+      className="group overflow-hidden bg-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 border border-border cursor-pointer"
+    >
       {/* Image */}
       <div className="relative h-48 overflow-hidden bg-muted">
         <img
@@ -52,10 +103,16 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
             Mentor's Pick
           </Badge>
         )}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
           <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
             {idea.category}
           </Badge>
+          {idea.status && (
+            <Badge className={`${getStatusColor(idea.status)} backdrop-blur-sm`}>
+              {getStatusIcon(idea.status)}
+              <span className="ml-1 text-xs">{idea.status.replace("_", " ")}</span>
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -79,27 +136,37 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
           ))}
         </div>
 
-        {/* AI Score */}
-        <div className="flex items-center gap-2 mb-4 p-2 bg-muted rounded-lg">
-          <TrendingUp className={`w-4 h-4 ${getScoreColor(idea.aiScore)}`} />
-          <div className="flex-1">
-            <div className="text-xs text-muted-foreground mb-1">AI Score</div>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-1.5 bg-background rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${
-                    idea.aiScore >= 80
-                      ? "bg-accent"
-                      : idea.aiScore >= 60
-                      ? "bg-primary"
-                      : "bg-muted-foreground"
-                  }`}
-                  style={{ width: `${idea.aiScore}%` }}
-                />
-              </div>
-              <span className={`text-sm font-bold ${getScoreColor(idea.aiScore)}`}>
+        {/* AI Score - Enhanced */}
+        <div className="mb-4 p-3 bg-gradient-to-r from-muted/50 to-muted/30 rounded-lg border border-border/50">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-1">
+              {idea.aiProcessed ? (
+                <TrendingUp className={`w-4 h-4 ${getScoreColor(idea.aiScore)}`} />
+              ) : (
+                <div className="w-4 h-4 rounded-full bg-yellow-500 animate-pulse" />
+              )}
+              <span className="text-xs font-medium text-muted-foreground">
+                {idea.aiProcessed ? "AI Analysis" : "Analyzing..."}
+              </span>
+            </div>
+            <div className="ml-auto">
+              <span className={`text-lg font-bold ${getScoreColor(idea.aiScore)}`}>
                 {idea.aiScore}
               </span>
+              <span className="text-xs text-muted-foreground ml-1">/100</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-2 bg-background/50 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-1000 ${getScoreBgColor(idea.aiScore)}`}
+                style={{ width: `${idea.aiScore}%` }}
+              />
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {idea.aiScore >= 80 ? "Excellent" : 
+               idea.aiScore >= 60 ? "Good" : 
+               idea.aiScore >= 40 ? "Fair" : "Needs Work"}
             </div>
           </div>
         </div>
