@@ -1,7 +1,18 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, MessageCircle, TrendingUp, Award, CheckCircle, Clock, XCircle, Lightbulb, Zap } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  ThumbsUp,
+  MessageCircle,
+  TrendingUp,
+  Award,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Lightbulb,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -32,7 +43,7 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
   const handleVote = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
     if (!hasVoted) {
-      setVotes(prev => prev + 1);
+      setVotes((prev) => prev + 1);
       setHasVoted(true);
     }
   };
@@ -86,7 +97,7 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
   };
 
   return (
-    <Card 
+    <Card
       onClick={handleCardClick}
       className="group overflow-hidden bg-card shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 border border-border cursor-pointer"
     >
@@ -108,9 +119,13 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
             {idea.category}
           </Badge>
           {idea.status && (
-            <Badge className={`${getStatusColor(idea.status)} backdrop-blur-sm`}>
+            <Badge
+              className={`${getStatusColor(idea.status)} backdrop-blur-sm`}
+            >
               {getStatusIcon(idea.status)}
-              <span className="ml-1 text-xs">{idea.status.replace("_", " ")}</span>
+              <span className="ml-1 text-xs">
+                {idea.status.replace("_", " ")}
+              </span>
             </Badge>
           )}
         </div>
@@ -129,7 +144,7 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1 mb-4">
-          {idea.tags.slice(0, 3).map(tag => (
+          {idea.tags.slice(0, 3).map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
@@ -141,7 +156,9 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
           <div className="flex items-center gap-2 mb-2">
             <div className="flex items-center gap-1">
               {idea.aiProcessed ? (
-                <TrendingUp className={`w-4 h-4 ${getScoreColor(idea.aiScore)}`} />
+                <TrendingUp
+                  className={`w-4 h-4 ${getScoreColor(idea.aiScore)}`}
+                />
               ) : (
                 <div className="w-4 h-4 rounded-full bg-yellow-500 animate-pulse" />
               )}
@@ -150,7 +167,9 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
               </span>
             </div>
             <div className="ml-auto">
-              <span className={`text-lg font-bold ${getScoreColor(idea.aiScore)}`}>
+              <span
+                className={`text-lg font-bold ${getScoreColor(idea.aiScore)}`}
+              >
                 {idea.aiScore}
               </span>
               <span className="text-xs text-muted-foreground ml-1">/100</span>
@@ -159,22 +178,48 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
           <div className="flex items-center gap-2">
             <div className="flex-1 h-2 bg-background/50 rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all duration-1000 ${getScoreBgColor(idea.aiScore)}`}
+                className={`h-full transition-all duration-1000 ${getScoreBgColor(
+                  idea.aiScore
+                )}`}
                 style={{ width: `${idea.aiScore}%` }}
               />
             </div>
             <div className="text-xs text-muted-foreground">
-              {idea.aiScore >= 80 ? "Excellent" : 
-               idea.aiScore >= 60 ? "Good" : 
-               idea.aiScore >= 40 ? "Fair" : "Needs Work"}
+              {idea.aiScore >= 80
+                ? "Excellent"
+                : idea.aiScore >= 60
+                ? "Good"
+                : idea.aiScore >= 40
+                ? "Fair"
+                : "Needs Work"}
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between">
-          <div className="text-xs text-muted-foreground">
-            by <span className="font-medium text-foreground">{idea.author}</span>
+          <div className="flex items-center gap-2">
+            <Avatar
+              className="w-6 h-6 border"
+              style={{ borderColor: "#E8D7C3" }}
+            >
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${idea.author}`}
+                alt={idea.author}
+              />
+              <AvatarFallback
+                className="text-white text-xs font-bold"
+                style={{
+                  background: "linear-gradient(135deg, #FF6B35, #FFB366)",
+                }}
+              >
+                {idea.author.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-xs text-muted-foreground">
+              by{" "}
+              <span className="font-medium text-foreground">{idea.author}</span>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -183,7 +228,9 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
               onClick={handleVote}
               className={`h-8 ${hasVoted ? "text-primary" : ""}`}
             >
-              <ThumbsUp className={`w-4 h-4 mr-1 ${hasVoted ? "fill-primary" : ""}`} />
+              <ThumbsUp
+                className={`w-4 h-4 mr-1 ${hasVoted ? "fill-primary" : ""}`}
+              />
               {votes}
             </Button>
             <Button variant="ghost" size="sm" className="h-8">
