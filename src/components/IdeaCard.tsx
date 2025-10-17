@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAvatarUrl, getInitials } from "@/lib/avatars";
 
 interface IdeaCardProps {
   idea: {
@@ -203,17 +204,14 @@ export const IdeaCard = ({ idea }: IdeaCardProps) => {
               className="w-6 h-6 border"
               style={{ borderColor: "#E8D7C3" }}
             >
-              <AvatarImage
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${idea.author}`}
-                alt={idea.author}
-              />
+              <AvatarImage src={getAvatarUrl(idea.author)} alt={idea.author} />
               <AvatarFallback
                 className="text-white text-xs font-bold"
                 style={{
                   background: "linear-gradient(135deg, #FF6B35, #FFB366)",
                 }}
               >
-                {idea.author.charAt(0)}
+                {getInitials(idea.author)}
               </AvatarFallback>
             </Avatar>
             <div className="text-xs text-muted-foreground">

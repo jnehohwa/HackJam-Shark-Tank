@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { leaderboard as leaderboardAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { getAvatarUrl, getInitials } from "@/lib/avatars";
 
 const BADGES_INFO = [
   {
@@ -200,7 +201,7 @@ const Leaderboard = () => {
                         style={{ borderColor: "#E8D7C3" }}
                       >
                         <AvatarImage
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                          src={getAvatarUrl(user.name)}
                           alt={user.name}
                         />
                         <AvatarFallback
@@ -210,7 +211,7 @@ const Leaderboard = () => {
                               "linear-gradient(135deg, #FF6B35, #FFB366)",
                           }}
                         >
-                          {user.name.charAt(0)}
+                          {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
@@ -289,15 +290,12 @@ const PodiumCard = ({ user, featured }: { user: any; featured?: boolean }) => {
             borderColor: featured ? "#FF6B35" : "#E8D7C3",
           }}
         >
-          <AvatarImage
-            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
-            alt={user.name}
-          />
+          <AvatarImage src={getAvatarUrl(user.name)} alt={user.name} />
           <AvatarFallback
             className="text-white font-bold text-2xl"
             style={{ background: "linear-gradient(135deg, #FF6B35, #FFB366)" }}
           >
-            {user.name.charAt(0)}
+            {getInitials(user.name)}
           </AvatarFallback>
         </Avatar>
         <div
